@@ -1,0 +1,3 @@
+# Nagios plugins
+
+Where the plural includes the singular, for now ...
