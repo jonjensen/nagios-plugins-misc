@@ -3,6 +3,7 @@
 # check_postfix_blocked.py
 # by Jon Jensen <jon@endpoint.com>
 # 2018-03-12 initial version
+# 2018-04-06 allow specifying log file path
 #
 # This is a Nagios plugin that scans Postfix logs (in syslog format) to
 # count outbound messages blocked or greylisted as spam and alert based
@@ -88,16 +89,17 @@ def main():
     parser = optparse.OptionParser()
     parser.add_option('-w', '--warn', type='int', help='warning threshold')
     parser.add_option('-c', '--crit', type='int', help='critical threshold')
+    parser.add_option('-f', '--file', type='str', default='/var/log/maillog', help='verbosity level')
     parser.add_option('-v', '--verbose', action='count', default=0, help='verbosity level')
     options, _ = parser.parse_args()
 
-    if len(sys.argv) < 2:
+    if not options.warn and not options.crit:
         parser.print_help()
         return UNKNOWN
 
     debug = options.verbose > 2
 
-    with open("/var/log/maillog") as fh:
+    with open(options.file) as fh:
         pb = PostfixBounces(filehandle=fh, warn=options.warn, crit=options.crit, debug=debug)
         pb.process()
         pb.report()
